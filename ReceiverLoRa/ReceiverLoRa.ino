@@ -1,16 +1,29 @@
 #include "Arduino.h"
 #include "LoRaWan_APP.h"
+#include <LiquidCrystal.h>
 
 /* ================= LoRa Parameters ================= */
 #define RF_FREQUENCY        868000000  // Hz (EU868)
 #define TX_OUTPUT_POWER     14         // dBm (not used, but required)
 #define LORA_BANDWIDTH      0          // 125 kHz
-#define LORA_SPREADING_FACTOR 7
-#define LORA_CODINGRATE     1          // 4/5
+#define LORA_SPREADING_FACTOR 10         // SF10: good range/speed balance for 5 km
+#define LORA_CODINGRATE     4          // 4/8: max error correction for long range
 #define LORA_PREAMBLE_LENGTH 8
 #define LORA_SYMBOL_TIMEOUT 0
 #define LORA_FIX_LENGTH_PAYLOAD_ON false
 #define LORA_IQ_INVERSION_ON false
+
+// Pin mapping (adjust to what you actually wired)
+#define RS 1
+#define E  2
+#define D4 3
+#define D5 4
+#define D6 5
+#define D7 6
+
+// Initialize the library
+LiquidCrystal lcd(RS, E, D4, D5, D6, D7);
+
 
 static RadioEvents_t RadioEvents;
 
@@ -47,7 +60,15 @@ void OnRxTimeout(void)
 
 /* ================= Setup ================= */
 void setup()
-{
+{  
+  // Initialize LCD (16 columns, 2 rows)
+  lcd.begin(16, 2);
+  // Print first message
+  lcd.setCursor(0, 0);   // column 0, row 0
+  lcd.print("Hello Luca!");
+  lcd.setCursor(0, 1);   // second row
+  lcd.print("CubeCell OK");
+
   Serial.begin(115200);
   delay(2000);
 
@@ -84,5 +105,6 @@ void setup()
 /* ================= Loop ================= */
 void loop()
 {
-  // Nothing needed here
+  /* Required by Heltec CubeCell library to dispatch radio events (RxDone, etc.) */
+  Radio.IrqProcess();
 }

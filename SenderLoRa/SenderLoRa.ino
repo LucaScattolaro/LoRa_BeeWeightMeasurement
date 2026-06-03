@@ -6,8 +6,8 @@
 #define RF_FREQUENCY        868000000  // Hz (EU868)
 #define TX_OUTPUT_POWER     14         // dBm
 #define LORA_BANDWIDTH      0          // 0:125kHz
-#define LORA_SPREADING_FACTOR 7
-#define LORA_CODINGRATE     1          // 4/5
+#define LORA_SPREADING_FACTOR 10         // SF10: good range/speed balance for 5 km
+#define LORA_CODINGRATE     4          // 4/8: max error correction for long range
 #define LORA_PREAMBLE_LENGTH 8
 #define LORA_SYMBOL_TIMEOUT 0
 #define LORA_FIX_LENGTH_PAYLOAD_ON false
@@ -75,6 +75,7 @@ void loop()
   /* Send packet */
   Radio.Send(txBuffer, strlen((char*)txBuffer));
 
-  /* Wait before next transmission */
+  /* Process radio IRQ and wait before next transmission */
+  Radio.IrqProcess();
   delay(5000);
 }
